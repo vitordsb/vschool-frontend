@@ -11,17 +11,44 @@ const Dashboard = () => {
   const { user, logout, isAdmin } = useAuth();
   const [roadmaps, setRoadmaps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAllRoadmaps, setShowAllRoadmaps] = useState([]);
 
   useEffect(() => {
     fetchRoadmaps();
+    if (isAdmin) {
+      fetchAllRoadmaps();
+    }
   }, []);
 
+  const handleDelete = async (roadmapId) => {
+    try {
+      await api.delete(`/roadmaps/${roadmapId}`);
+      fetchRoadmaps();
+      if (isAdmin) {
+        fetchAllRoadmaps();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir roadmap:', error);
+    }
+  }
   const fetchRoadmaps = async () => {
     try {
       const response = await api.get('/roadmaps');
       setRoadmaps(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Erro ao buscar roadmaps:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchAllRoadmaps = async () => {
+    try {
+      const response = await api.get('/roadmaps/getall');
+      setShowAllRoadmaps(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar todos os roadmaps:', error);
     } finally {
       setLoading(false);
     }
@@ -47,7 +74,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Roadmap SaaS
+                VconStudy - Dashboard
               </h1>
               <p className="text-gray-600">
                 Bem-vindo, {user?.username} ({user?.role === 'admin' ? 'Administrador' : 'Estudante'})
@@ -73,15 +100,17 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Actions */}
-          <div className="mb-6">
-            <Button className="mb-4" onClick={() => navigate('/create-roadmap')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Novo Roadmap
-            </Button>
-          </div>
 
-          {/* Roadmaps Grid */}
-          {roadmaps.length === 0 ? (
+          {isAdmin && (
+            <div className="mb-4">
+              <Button onClick={() => navigate('/create-roadmap')}>
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Roadmap
+              </Button>
+            </div>
+          )}
+
+          {!isAdmin && roadmaps.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <BookOpen className="w-12 h-12 text-gray-400 mb-4" />
@@ -128,6 +157,58 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+          {isAdmin && showAllRoadmaps.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <BookOpen className="w-12 h-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Nenhum roadmap encontrado
+                </h3>
+                <p className="text-gray-500 text-center mb-4">
+                  Comece criando seu primeiro roadmap de estudos
+                </p>
+                <Button onClick={() => navigate('/create-roadmap')}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Criar Roadmap
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showAllRoadmaps.map((showAllRoadmaps) => (
+                <Card key={showAllRoadmaps._id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <span>Aluno: {showAllRoadmaps.owner_id.username}</span>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{showAllRoadmaps.title}</span>
+                      {showAllRoadmaps.is_public && (
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                          Público
+                        </span>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      {showAllRoadmaps.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">
+                        Criado em {new Date(showAllRoadmaps.createdAt).toLocaleDateString('pt-BR')}
+                      </span>
+                      <Button size="sm" onClick={() => navigate(`/roadmap/${roadmap._id}`)}>
+                        Ver Roadmap
+                      </Button>
+                      <Button onClick={() => handleDelete(showAllRoadmaps._id)} variant="destructive" size="sm">
+                        Excluir
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
         </div>
       </main>
     </div>

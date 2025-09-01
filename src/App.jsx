@@ -15,37 +15,45 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/create-roadmap" 
+            <Route
+              path="/create-roadmap"
               element={
                 <ProtectedRoute>
                   <CreateRoadmap />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/roadmap/:id" 
+            <Route
+              path="/roadmap/:id"
               element={
                 <ProtectedRoute>
                   <RoadmapView />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/users" 
+            <Route
+              path="/users"
               element={
                 <ProtectedRoute adminOnly={true}>
                   <UserManagement />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/roadmaps/new"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <CreateRoadmap />
+                </ProtectedRoute>
+              }
             />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>

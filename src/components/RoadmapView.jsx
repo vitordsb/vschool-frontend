@@ -112,14 +112,7 @@ const RoadmapView = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/dashboard')}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-              <div>
+                            <div>
                 <h1 className="text-3xl font-bold text-gray-900">
                   {roadmap.title}
                 </h1>
@@ -127,18 +120,19 @@ const RoadmapView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/dashboard')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
               {roadmap.is_public && (
                 <Button variant="outline" onClick={shareRoadmap}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Compartilhar
                 </Button>
               )}
-              <div className="text-right">
-                <div className="text-2xl font-bold text-primary">
-                  {progressPercentage}%
-                </div>
-                <div className="text-sm text-gray-500">Progresso Geral</div>
-              </div>
             </div>
           </div>
         </div>
@@ -150,7 +144,11 @@ const RoadmapView = () => {
           <Progress value={progressPercentage} className="w-full" />
           <div className="flex justify-between text-sm text-gray-500 mt-2">
             <span>{Object.values(progress).filter(Boolean).length} de {modules.length} módulos concluídos</span>
-            <span>{progressPercentage}% completo</span>
+            {progressPercentage === 100 ? (
+              <span className="font-semibold text-green-500">Parabéns, voce concluiu o roadmap!</span>            
+            ) : (
+                <span className="font-semibold text-red-500">{progressPercentage}% completo</span>
+            ) }  
           </div>
         </div>
       </div>

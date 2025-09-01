@@ -33,13 +33,16 @@ const UserManagement = () => {
       setLoading(false);
     }
   };
-
+  const handleAssignRoadmap = async (user) => {
+    navigate("/roadmaps/new", { state: { forUsername: user.username } });
+  };
   const handleCreateUser = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
       await api.post('/users', newUser);
+      console.log(newUser);
       setNewUser({ username: '', password: '', role: 'student' });
       setShowCreateForm(false);
       fetchUsers();
@@ -74,8 +77,8 @@ const UserManagement = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => navigate('/dashboard')}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -125,7 +128,7 @@ const UserManagement = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="text-sm font-medium">Senha</label>
                     <Input
@@ -150,9 +153,9 @@ const UserManagement = () => {
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       onClick={() => setShowCreateForm(false)}
                     >
                       Cancelar
@@ -177,8 +180,8 @@ const UserManagement = () => {
             <CardContent>
               <div className="space-y-3">
                 {users.map((user) => (
-                  <div 
-                    key={user._id} 
+                  <div
+                    key={user._id}
                     className="flex items-center justify-between p-4 border rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
@@ -196,13 +199,20 @@ const UserManagement = () => {
                       </span>
                       {user.role !== 'admin' && (
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteUser(user._id)}
                         >
                           <Trash2 className="w-4 h-4" />
+                          Deletar
                         </Button>
                       )}
+                      <Button
+                        size="sm"
+                        onClick={() => handleAssignRoadmap(user)}
+                      >
+                        Atribuir roadmap
+                      </Button>
                     </div>
                   </div>
                 ))}

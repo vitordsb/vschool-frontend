@@ -11,7 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login, isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
@@ -24,11 +24,11 @@ const Login = () => {
     setLoading(true);
 
     const result = await login(username, password);
-    
+    console.log(result);
     if (!result.success) {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
@@ -36,7 +36,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Roadmap SaaS</CardTitle>
+          <CardTitle className="text-2xl text-center">VconStudy - Login</CardTitle>
           <CardDescription className="text-center">
             Entre com suas credenciais para acessar a plataforma
           </CardDescription>
@@ -48,10 +48,10 @@ const Login = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <label htmlFor="username" className="text-sm font-medium">
-               Aluno 
+                Aluno
               </label>
               <Input
                 id="username"
@@ -62,7 +62,7 @@ const Login = () => {
                 placeholder="Digite seu usuário"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
                 Senha
@@ -76,10 +76,10 @@ const Login = () => {
                 placeholder="Digite sua senha"
               />
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
+
+            <Button
+              type="submit"
+              className="w-full"
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar'}

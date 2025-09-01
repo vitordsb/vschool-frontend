@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -11,6 +11,9 @@ import api from '../lib/api.jsx';
 const CreateRoadmap = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const [forUsername, setForUsername] = useState('');
   const [error, setError] = useState('');
   const [roadmap, setRoadmap] = useState({
     title: '',
@@ -20,6 +23,13 @@ const CreateRoadmap = () => {
   const [modules, setModules] = useState([
     { title: '', description: '', order: 1 }
   ]);
+  useEffect(() => {
+    const fromState = location?.state?.forUsername;
+    const fromQuery = searchParams.get("for");
+
+    if (fromState && !forUsername) setForUsername(fromState);
+    else if (fromQuery && !forUsername) setForUsername(fromQuery);
+  }, [location?.state, searchParams, forUsername]);
 
   const handleRoadmapChange = (field, value) => {
     setRoadmap(prev => ({ ...prev, [field]: value }));
@@ -32,10 +42,10 @@ const CreateRoadmap = () => {
   };
 
   const addModule = () => {
-    setModules(prev => [...prev, { 
-      title: '', 
-      description: '', 
-      order: prev.length + 1 
+    setModules(prev => [...prev, {
+      title: '',
+      description: '',
+      order: prev.length + 1
     }]);
   };
 
@@ -56,19 +66,25 @@ const CreateRoadmap = () => {
     setLoading(true);
 
     try {
-      // Criar roadmap
-      const roadmapResponse = await api.post('/roadmaps', roadmap);
-      const createdRoadmap = roadmapResponse.data;
+      if (forUsername.trim()) {
+        await api.post('/roadmaps/assign/by-username', {
+          username: forUsername.trim(),
+          ...roadmap,
+          modules
+        });
+      } else {
+        // Fluxo atual: cria para si e depois os módulos
+        const roadmapResponse = await api.post('/roadmaps', roadmap);
+        const createdRoadmap = roadmapResponse.data;
+        console.log(createdRoadmap);
 
-      // Criar módulos
-      for (const module of modules) {
-        if (module.title.trim()) {
-          await api.post('/modules', {
-            ...module,
-            roadmap_id: createdRoadmap._id
-          });
+        for (const module of modules) {
+          if ((module.title || '').trim()) {
+            await api.post('/modules', { ...module, roadmap_id: createdRoadmap._id });
+          }
         }
       }
+      window.alert(`Roadmap criado para o aluno ${forUsername}`);
 
       navigate('/dashboard');
     } catch (error) {
@@ -83,8 +99,8 @@ const CreateRoadmap = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate('/dashboard')}
             className="mb-4"
           >
@@ -112,6 +128,19 @@ const CreateRoadmap = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
+                <label className="text-sm font-medium">Criar para (username do aluno)</label>
+                <Input
+                  value={forUsername}
+                  onChange={(e) => setForUsername(e.target.value)}
+                  placeholder="Ex.: joaosilva"
+                />
+                {forUsername && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Criando para <span className="font-medium">{forUsername}</span>
+                  </p>
+                )}
+              </div>
+              <div>
                 <label className="text-sm font-medium">Título</label>
                 <Input
                   value={roadmap.title}
@@ -120,7 +149,7 @@ const CreateRoadmap = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium">Descrição</label>
                 <Textarea
@@ -176,7 +205,7 @@ const CreateRoadmap = () => {
                       </Button>
                     )}
                   </div>
-                  
+
                   <div>
                     <label className="text-sm font-medium">Título do Módulo</label>
                     <Input
@@ -186,7 +215,7 @@ const CreateRoadmap = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="text-sm font-medium">Descrição</label>
                     <Textarea
@@ -203,9 +232,9 @@ const CreateRoadmap = () => {
 
           {/* Botões de Ação */}
           <div className="flex justify-end space-x-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => navigate('/dashboard')}
             >
               Cancelar
