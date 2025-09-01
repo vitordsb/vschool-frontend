@@ -46,6 +46,7 @@ const Dashboard = () => {
     try {
       const response = await api.get('/roadmaps/getall');
       setShowAllRoadmaps(response.data);
+      // verificar se o roadmap é publico 
       console.log(response.data);
     } catch (error) {
       console.error('Erro ao buscar todos os roadmaps:', error);
@@ -196,9 +197,11 @@ const Dashboard = () => {
                       <span className="text-sm text-gray-500">
                         Criado em {new Date(showAllRoadmaps.createdAt).toLocaleDateString('pt-BR')}
                       </span>
-                      <Button size="sm" onClick={() => navigate(`/roadmap/${roadmap._id}`)}>
-                        Ver Roadmap
-                      </Button>
+                      {showAllRoadmaps.is_public && (
+                        <Button size="sm" onClick={() => navigate(`/roadmap/${showAllRoadmaps._id}`)}>
+                          Ver Roadmap
+                        </Button>
+                      )}
                       <Button onClick={() => handleDelete(showAllRoadmaps._id)} variant="destructive" size="sm">
                         Excluir
                       </Button>
