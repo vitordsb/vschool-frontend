@@ -197,11 +197,9 @@ const Dashboard = () => {
                       <span className="text-sm text-gray-500">
                         Criado em {new Date(showAllRoadmaps.createdAt).toLocaleDateString('pt-BR')}
                       </span>
-                      {showAllRoadmaps.is_public && (
-                        <Button size="sm" onClick={() => navigate(`/roadmap/${showAllRoadmaps._id}`)}>
-                          Ver Roadmap
-                        </Button>
-                      )}
+                      <Button size="sm" onClick={() => navigate(`/roadmap/${showAllRoadmaps._id}`)}>
+                        Ver Roadmap
+                      </Button>
                       <Button onClick={() => handleDelete(showAllRoadmaps._id)} variant="destructive" size="sm">
                         Excluir
                       </Button>
