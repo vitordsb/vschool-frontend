@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 
-const Login = () => {
+const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login, isAuthenticated } = useAuth();
+  const { isAuthenticated, register } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -22,14 +22,24 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    if (password !== confirm) {
+      setError('As senhas não conferem');
+      return;
+    }
+    if (username.trim().length < 3) {
+      setError('O usuário deve ter ao menos 3 caracteres');
+      return;
+    }
+    if (password.length < 6) {
+      setError('A senha deve ter ao menos 6 caracteres');
+      return;
+    }
 
-    const result = await login(username, password);
-    console.log(result);
+    setLoading(true);
+    const result = await register(username.trim(), password);
     if (!result.success) {
       setError(result.message);
     }
-
     setLoading(false);
   };
 
@@ -37,9 +47,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">RevisaEM - Login</CardTitle>
+          <CardTitle className="text-2xl text-center">RevisaEM - Criar conta</CardTitle>
           <CardDescription className="text-center">
-            Entre com suas credenciais para acessar a plataforma
+            Crie sua conta de aluno para acessar a plataforma
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -52,7 +62,7 @@ const Login = () => {
 
             <div className="space-y-2">
               <label htmlFor="username" className="text-sm font-medium">
-                Aluno
+                Usuário
               </label>
               <Input
                 id="username"
@@ -60,7 +70,7 @@ const Login = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                placeholder="Digite seu usuário"
+                placeholder="Seu nome de usuário"
               />
             </div>
 
@@ -74,20 +84,31 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Digite sua senha"
+                placeholder="Crie uma senha"
               />
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? 'Entrando...' : 'Entrar'}
+            <div className="space-y-2">
+              <label htmlFor="confirm" className="text-sm font-medium">
+                Confirmar senha
+              </label>
+              <Input
+                id="confirm"
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                placeholder="Repita a senha"
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Criando conta...' : 'Criar conta'}
             </Button>
+
             <p className="text-sm text-center text-gray-600 mt-2">
-              Não tem conta?{' '}
-              <Link to="/register" className="text-blue-600 hover:underline">Criar conta</Link>
+              Já tem conta?{' '}
+              <Link to="/login" className="text-blue-600 hover:underline">Entrar</Link>
             </p>
           </form>
         </CardContent>
@@ -96,4 +117,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

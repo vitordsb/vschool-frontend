@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './hooks/useAuth.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import CreateRoadmap from './components/CreateRoadmap';
 import RoadmapView from './components/RoadmapView';
@@ -15,6 +16,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route
               path="/dashboard"
               element={
@@ -64,4 +66,3 @@ function App() {
 }
 
 export default App;
-

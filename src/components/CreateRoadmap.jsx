@@ -7,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Alert, AlertDescription } from './ui/alert';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import api from '../lib/api.jsx';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const CreateRoadmap = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { isAdmin } = useAuth();
   const [forUsername, setForUsername] = useState('');
   const [error, setError] = useState('');
   const [roadmap, setRoadmap] = useState({
@@ -66,7 +68,7 @@ const CreateRoadmap = () => {
     setLoading(true);
 
     try {
-      if (forUsername.trim()) {
+      if (isAdmin && forUsername.trim()) {
         await api.post('/roadmaps/assign/by-username', {
           username: forUsername.trim(),
           ...roadmap,
@@ -84,7 +86,11 @@ const CreateRoadmap = () => {
           }
         }
       }
-      window.alert(`Roadmap criado para o aluno ${forUsername}`);
+      if (isAdmin && forUsername.trim()) {
+        window.alert(`Roadmap criado para o aluno ${forUsername}`);
+      } else {
+        window.alert('Roadmap criado com sucesso');
+      }
 
       navigate('/dashboard');
     } catch (error) {
@@ -127,19 +133,21 @@ const CreateRoadmap = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Criar para (username do aluno)</label>
-                <Input
-                  value={forUsername}
-                  onChange={(e) => setForUsername(e.target.value)}
-                  placeholder="Ex.: joaosilva"
-                />
-                {forUsername && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Criando para <span className="font-medium">{forUsername}</span>
-                  </p>
-                )}
-              </div>
+              {isAdmin && (
+                <div>
+                  <label className="text-sm font-medium">Criar para (username do aluno)</label>
+                  <Input
+                    value={forUsername}
+                    onChange={(e) => setForUsername(e.target.value)}
+                    placeholder="Ex.: joaosilva"
+                  />
+                  {forUsername && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Criando para <span className="font-medium">{forUsername}</span>
+                    </p>
+                  )}
+                </div>
+              )}
               <div>
                 <label className="text-sm font-medium">Título</label>
                 <Input
@@ -250,4 +258,3 @@ const CreateRoadmap = () => {
 };
 
 export default CreateRoadmap;
-

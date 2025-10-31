@@ -75,7 +75,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                VconStudy - Dashboard
+                RevisaEM - Dashboard
               </h1>
               <p className="text-gray-600">
                 Bem-vindo, {user?.username} ({user?.role === 'admin' ? 'Administrador' : 'Estudante'})
@@ -102,14 +102,12 @@ const Dashboard = () => {
         <div className="px-4 py-6 sm:px-0">
           {/* Actions */}
 
-          {isAdmin && (
-            <div className="mb-4">
-              <Button onClick={() => navigate('/create-roadmap')}>
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Roadmap
-              </Button>
-            </div>
-          )}
+          <div className="mb-4">
+            <Button onClick={() => navigate('/create-roadmap')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Roadmap
+            </Button>
+          </div>
 
           {!isAdmin && roadmaps.length === 0 ? (
             <Card>
@@ -217,4 +215,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
